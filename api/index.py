@@ -77,20 +77,18 @@ def init_db():
             );
         """)
         
-        # 3. ใส่ข้อมูลเริ่มต้นให้ตาราง keywords (หากยังไม่มีข้อมูลเลย)
-        cur.execute("SELECT COUNT(*) FROM keywords;")
-        count = cur.fetchone()[0]
-        if count == 0:
-            defaults = [
-                ("ราคา", "ราคาของสินค้าเริ่มต้นที่ 100 บาทครับ สามารถสอบถามรุ่นที่สนใจเพิ่มเติมได้เลยครับ 🏷️"),
-                ("สั่งซื้อ", "หากต้องการสั่งซื้อสินค้า สามารถพิมพ์รายการสินค้าที่ต้องการและจำนวน หรือแจ้งชื่อ-ที่อยู่เพื่อตรวจสอบค่าจัดส่งได้เลยครับ 🛒"),
-                ("สวัสดี", "สวัสดีครับ! ยินดีต้อนรับสู่บริการของเรา มีอะไรให้เราช่วยเหลือวันนี้ไหมครับ? 😊")
-            ]
-            cur.executemany(
-                "INSERT INTO keywords (keyword, reply_text) VALUES (%s, %s);",
-                defaults
-            )
-            print("ใส่ข้อมูลคีย์เวิร์ดเริ่มต้นสำเร็จ")
+        # 3. ใส่ข้อมูลเริ่มต้นให้ตาราง keywords (UPSERT เพื่ออัปเดตข้อมูลของ Thai Inter Flying)
+        defaults = [
+            ("สวัสดี", "สวัสดีครับ ยินดีต้อนรับสู่สถาบันฝึกอบรมการบิน Thai Inter Flying School ✈️ ยินดีให้บริการข้อมูลหลักสูตรการบิน (PPL, CPL), เครื่องช่วยฝึกบินจำลอง (Simulator) หรือติดต่อเจ้าหน้าที่ สามารถพิมพ์สอบถามได้เลยครับ 😊"),
+            ("หลักสูตร", "หลักสูตรการบินของ Thai Inter Flying:\n1. Private Pilot License (PPL) - หลักสูตรนักบินส่วนบุคคล\n2. Commercial Pilot License (CPL) - หลักสูตรนักบินพาณิชย์ตรี\n3. Instrument Rating (IR) - การบินด้วยเครื่องวัดประกอบการบิน\n4. Multi-Engine Rating (ME) - เครื่องบินสองเครื่องยนต์\n5. Airline Transport Pilot License (ATPL) - นักบินพาณิชย์เอก\n\nสนใจหลักสูตรไหนเป็นพิเศษ พิมพ์สอบถามได้เลยครับ!"),
+            ("ราคา", "ราคาหลักสูตรและบริการโดยสังเขป:\n• หลักสูตรนักบินส่วนบุคคล (PPL): เริ่มต้นพิเศษ 3xx,xxx บาท\n• เครื่องช่วยฝึกบินจำลอง (Simulator): เริ่มต้นชั่วโมงละ 2,500 บาท\n*หากต้องการใบเสนอราคาและเงื่อนไขการแบ่งชำระ กรุณาแจ้งชื่อและเบอร์ติดต่อกลับ หรือติดต่อฝ่ายการตลาด โทร 095-604-9999 ครับ 📞"),
+            ("ติดต่อ", "ช่องทางการติดต่อสถาบัน Thai Inter Flying:\n📍 ที่ตั้ง: 10/11 ซอยวิภาวดี 64 ถนนวิภาวดี-รังสิต แขวงตลาดบางเขน เขตหลักสี่ กรุงเทพฯ 10210\n📞 เบอร์โทร: 02-114-3325 หรือ 095-604-9999\n📧 อีเมล: marketing@thaiinterflying.ac.th\n💬 LINE ID: @thaiinterflying\n🌐 เว็บไซต์: www.thaiinterflying.ac.th")
+        ]
+        cur.executemany("""
+            INSERT INTO keywords (keyword, reply_text) VALUES (%s, %s)
+            ON CONFLICT (keyword) DO UPDATE SET reply_text = EXCLUDED.reply_text;
+        """, defaults)
+        print("เริ่มต้น/อัปเดตข้อมูลคีย์เวิร์ดของสถาบันการบินสำเร็จ")
             
         conn.commit()
         cur.close()
@@ -202,7 +200,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINE OA Chatbot Dashboard</title>
+    <title>Thai Inter Flying - Chatbot Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -664,8 +662,8 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         <div class="logo-area">
             <div class="logo-dot"></div>
             <div>
-                <h1>LINE OA Chatbot Dashboard</h1>
-                <p>ควบคุม แก้ไขคำตอบบอท และสถิติคำสนทนา</p>
+                <h1>Thai Inter Flying Chatbot Dashboard</h1>
+                <p>แผงควบคุมแชทบอทและการตอบกลับอัตโนมัติ - Thai Inter Flying Co., Ltd.</p>
             </div>
         </div>
         <div>
