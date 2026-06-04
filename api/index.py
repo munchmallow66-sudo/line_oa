@@ -949,7 +949,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
         function escapeJs(str) {
             return str.replace(/['"\\\\\\n\\r]/g, 
-                char => ({ "'": "\\\\'", '"': "\\\\\"", '\\\\': '\\\\\\\\', '\\n': '\\\\n', '\\r': '\\\\r' }[char] || char)
+                char => ({ "'": "\\\\'", '"': '\\\\"', '\\\\': '\\\\\\\\', '\\n': '\\\\n', '\\r': '\\\\r' }[char] || char)
             );
         }
 
