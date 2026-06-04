@@ -948,9 +948,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         }
 
         function escapeJs(str) {
-            return str.replace(/['"\\\\\\n\\r]/g, 
-                char => ({ "'": "\\\\'", '"': '\\\\"', '\\\\': '\\\\\\\\', '\\n': '\\\\n', '\\r': '\\\\r' }[char] || char)
-            );
+            return JSON.stringify(str).slice(1, -1).replace(/'/g, String.fromCharCode(92) + "'");
         }
 
         async function handleLogout() {
