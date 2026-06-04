@@ -1284,7 +1284,7 @@ class handler(BaseHTTPRequestHandler):
                     
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/json; charset=utf-8')
-                    self.send_header('Set-Cookie', f"admin_session={session_token}; Path=/; HttpOnly; Max-Age=86400; SameSite=Lax")
+                    self.send_header('Set-Cookie', f"admin_session={session_token}; Path=/; HttpOnly; Secure; Max-Age=86400; SameSite=Lax")
                     self.end_headers()
                     self.wfile.write(json.dumps({"status": "success", "message": "เข้าสู่ระบบสำเร็จ"}).encode('utf-8'))
                 else:
