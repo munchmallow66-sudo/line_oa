@@ -963,10 +963,57 @@ class handler(BaseHTTPRequestHandler):
     คลาส Handler สำหรับจัดสรรการเรียกคำขอรับ Webhook และส่งหน้า Frontend Dashboard API
     """
     
+    def check_auth(self):
+        """
+        ตรวจสอบสิทธิ์การเข้าถึงด้วย HTTP Basic Authentication
+        เพื่อความปลอดภัยของข้อมูลประวัติแชทและคำตอบของบอท
+        """
+        # ดึงข้อมูลรหัสผู้ใช้จาก Env (ความปลอดภัยขั้นสูง) โดยมีค่าเริ่มต้นสำรองเป็น admin / flying123
+        admin_user = os.environ.get("ADMIN_USERNAME", "admin")
+        admin_pass = os.environ.get("ADMIN_PASSWORD", "flying123")
+        
+        auth_header = self.headers.get('Authorization')
+        if auth_header:
+            try:
+                auth_type, encoded = auth_header.split(' ', 1)
+                if auth_type.lower() == 'basic':
+                    decoded = base64.b64decode(encoded).decode('utf-8')
+                    username, password = decoded.split(':', 1)
+                    if username == admin_user and password == admin_pass:
+                        return True
+            except Exception as e:
+                print(f"เกิดข้อผิดพลาดในการถอดรหัสผ่าน Basic Auth: {e}")
+                
+        # ส่งสถานะ 401 เพื่อเรียกหน้าต่างล็อกอินของเว็บบราวเซอร์
+        self.send_response(401)
+        self.send_header('WWW-Authenticate', 'Basic realm="Thai Inter Flying Admin"')
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.end_headers()
+        self.wfile.write("""
+        <html>
+            <head>
+                <title>401 Unauthorized</title>
+                <style>
+                    body { font-family: sans-serif; text-align: center; padding-top: 100px; background-color: #0f172a; color: #94a3b8; }
+                    h1 { color: #ef4444; }
+                </style>
+            </head>
+            <body>
+                <h1>401 Unauthorized</h1>
+                <p>กรุณาล็อกอินด้วยชื่อผู้ใช้และรหัสผ่านที่ถูกต้องเพื่อเข้าใช้งานแผงควบคุมระบบ</p>
+            </body>
+        </html>
+        """.encode('utf-8'))
+        return False
+    
     def do_GET(self):
         """
         จัดการคำขอ HTTP GET สำหรับการดึงข้อมูล API หรือการเรียกเข้าแดชบอร์ดหลัก
         """
+        # ตรวจสอบสิทธิ์การล็อกอินก่อนเข้าใช้งานเสมอ
+        if not self.check_auth():
+            return
+            
         # API: เรียกดึงประวัติข้อความของลูกค้า
         if self.path == '/api/messages':
             try:
@@ -1027,6 +1074,11 @@ class handler(BaseHTTPRequestHandler):
         """
         จัดการคำขอ HTTP POST ซึ่งใช้รับข้อมูล Webhook จาก LINE และบันทึก/แก้ไขข้อมูลจากแดชบอร์ด
         """
+        # หากคำขอไม่ได้มาจาก LINE Webhook (พาธ /webhook) จะต้องตรวจสอบล็อกอินเสมอก่อนใช้งาน
+        if self.path != '/webhook':
+            if not self.check_auth():
+                return
+                
         # API Dashboard: บันทึกหรืออัปเดต Keyword
         if self.path == '/api/keywords/save':
             try:
