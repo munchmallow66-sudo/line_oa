@@ -13,6 +13,27 @@ try:
 except ImportError:
     print("Warning: psycopg2-binary not installed. Database logging will fail unless deployed on Vercel with correct dependencies.")
 
+def load_dotenv():
+    """
+    โหลดไฟล์ .env (ถ้ามีอยู่) เข้าสู่ os.environ อัตโนมัติสำหรับการรันแบบโลคอล
+    โดยไม่ต้องติดตั้งไลบรารีภายนอกเพิ่มเติม
+    """
+    try:
+        env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+        if os.path.exists(env_path):
+            with open(env_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, val = line.split('=', 1)
+                        os.environ[key.strip()] = val.strip()
+            print("โหลดค่าจากไฟล์ .env สำเร็จ")
+    except Exception as e:
+        print(f"เกิดข้อผิดพลาดในการโหลดไฟล์ .env: {e}")
+
+# เรียกใช้งานโหลด .env
+load_dotenv()
+
 # โหลดค่าคอนฟิกจาก Environment Variables (พร้อมตั้งค่าเริ่มต้นสำรองไว้สำหรับการทดสอบ)
 LINE_CHANNEL_SECRET = os.environ.get(
     "LINE_CHANNEL_SECRET", 
