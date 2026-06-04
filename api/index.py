@@ -953,9 +953,12 @@ HTML_DASHBOARD = """<!DOCTYPE html>
             );
         }
 
-        function handleLogout() {
-            // ลบเซสชันคุกกี้โดยการตั้งให้หมดอายุย้อนหลัง
-            document.cookie = "admin_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        async function handleLogout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+            } catch (err) {
+                console.error("Logout error:", err);
+            }
             window.location.reload();
         }
 
@@ -1248,17 +1251,18 @@ class handler(BaseHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
         else:
-            # ตรวจสอบสิทธิ์การเข้าถึงหน้าแดชบอร์ด
+            # ตรวจสอบสิทธิ์การเข้าถึงหน้าแดชบอร์ด พร้อมป้องกันการแคชหน้า HTML
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+            self.end_headers()
+            
             if self.check_auth():
-                self.send_response(200)
-                self.send_header('Content-Type', 'text/html; charset=utf-8')
-                self.end_headers()
                 self.wfile.write(HTML_DASHBOARD.encode('utf-8'))
             else:
                 # ส่งหน้าล็อกอินดีไซน์สวยงาม (HTML_LOGIN)
-                self.send_response(200)
-                self.send_header('Content-Type', 'text/html; charset=utf-8')
-                self.end_headers()
                 self.wfile.write(HTML_LOGIN.encode('utf-8'))
 
     def do_POST(self):
@@ -1297,6 +1301,14 @@ class handler(BaseHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.end_headers()
                 self.wfile.write(json.dumps({"error": f"เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์: {str(e)}"}).encode('utf-8'))
+                
+        # API: ล็อกเอาท์ออกจากแดชบอร์ด (Logout API)
+        elif self.path == '/api/logout':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Set-Cookie', 'admin_session=; Path=/; HttpOnly; Secure; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; SameSite=Lax')
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "success", "message": "ออกจากระบบสำเร็จ"}).encode('utf-8'))
                 
         # API Dashboard: บันทึกหรืออัปเดต Keyword
         elif self.path == '/api/keywords/save':
