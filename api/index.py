@@ -666,10 +666,13 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                 <p>แผงควบคุมแชทบอทและการตอบกลับอัตโนมัติ - Thai Inter Flying Co., Ltd.</p>
             </div>
         </div>
-        <div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
             <span style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--glass-border)">
-                Neon PostgreSQL & Vercel Serverless
+                Neon PostgreSQL & Vercel
             </span>
+            <button onclick="handleLogout()" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;">
+                ออกจากระบบ
+            </button>
         </div>
     </header>
 
@@ -950,9 +953,219 @@ HTML_DASHBOARD = """<!DOCTYPE html>
             );
         }
 
+        function handleLogout() {
+            // ลบเซสชันคุกกี้โดยการตั้งให้หมดอายุย้อนหลัง
+            document.cookie = "admin_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+            window.location.reload();
+        }
+
         // โหลดข้อมูลเริ่มต้นและตั้งค่าการดึงข้อมูลใหม่ทุก 10 วินาที
         window.onload = loadData;
         setInterval(loadData, 10000);
+    </script>
+</body>
+</html>
+"""
+
+# HTML โครงสร้างสำหรับหน้าต่างล็อกอินดีไซน์หรูหรา (Aesthetic Glassmorphism Login UI)
+HTML_LOGIN = """<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ | Thai Inter Flying Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #06C755;
+            --accent-hover: #05b04b;
+            --danger: #ef4444;
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Prompt', sans-serif; }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .glow-circle {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(6, 199, 85, 0.12) 0%, rgba(0,0,0,0) 70%);
+            z-index: 1;
+        }
+        .glow-circle-1 { top: -100px; left: -100px; }
+        .glow-circle-2 { bottom: -100px; right: -100px; }
+        
+        .login-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            padding: 3.5rem 2.5rem;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+            z-index: 2;
+            animation: cardAppear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            text-align: center;
+        }
+        @keyframes cardAppear {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            background: rgba(6, 199, 85, 0.1);
+            color: var(--accent);
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 16px -4px rgba(6, 199, 85, 0.2);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+        @keyframes logoFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+        h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; letter-spacing: -0.025em; }
+        .subtitle { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2.5rem; }
+        .form-group { text-align: left; margin-bottom: 1.5rem; }
+        label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 500; }
+        input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 0.85rem 1.2rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(6, 199, 85, 0.15);
+            background: rgba(15, 23, 42, 0.8);
+        }
+        .btn-submit {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.95rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(6, 199, 85, 0.3);
+        }
+        .btn-submit:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px -3px rgba(6, 199, 85, 0.4);
+        }
+        .btn-submit:active { transform: translateY(0px); }
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            text-align: left;
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-circle glow-circle-1"></div>
+    <div class="glow-circle glow-circle-2"></div>
+    
+    <div class="login-card">
+        <div class="brand-logo">✈️</div>
+        <h2>Thai Inter Flying</h2>
+        <p class="subtitle">ระบบจัดการแชทบอทและการตอบกลับ</p>
+        
+        <div class="error-message" id="error-msg"></div>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">ชื่อผู้ใช้งาน</label>
+                <input type="text" id="username" required autocomplete="username" placeholder="กรอกชื่อผู้ใช้">
+            </div>
+            <div class="form-group">
+                <label for="password">รหัสผ่าน</label>
+                <input type="password" id="password" required autocomplete="current-password" placeholder="กรอกรหัสผ่าน">
+            </div>
+            <button type="submit" class="btn-submit" id="submit-btn">เข้าสู่ระบบ</button>
+        </form>
+    </div>
+
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'กำลังตรวจสอบสิทธิ์...';
+            errorMsg.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    window.location.reload();
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'เข้าสู่ระบบ';
+                    errorMsg.textContent = result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+                    errorMsg.style.display = 'block';
+                    errorMsg.style.animation = 'none';
+                    errorMsg.offsetHeight;
+                    errorMsg.style.animation = null;
+                }
+            } catch (err) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'เข้าสู่ระบบ';
+                errorMsg.textContent = 'การเชื่อมต่อขัดข้อง กรุณาลองใหม่อีกครั้ง';
+                errorMsg.style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>
@@ -965,122 +1178,135 @@ class handler(BaseHTTPRequestHandler):
     
     def check_auth(self):
         """
-        ตรวจสอบสิทธิ์การเข้าถึงด้วย HTTP Basic Authentication
-        เพื่อความปลอดภัยของข้อมูลประวัติแชทและคำตอบของบอท
+        ตรวจสอบสิทธิ์การเข้าถึงด้วยระบบ Cookie Session
         """
-        # ดึงข้อมูลรหัสผู้ใช้จาก Env (ความปลอดภัยขั้นสูง) โดยมีค่าเริ่มต้นสำรองเป็น admin / flying123
         admin_user = os.environ.get("ADMIN_USERNAME", "admin")
         admin_pass = os.environ.get("ADMIN_PASSWORD", "flying123")
+        expected_session = hashlib.sha256(f"{admin_user}:{admin_pass}".encode('utf-8')).hexdigest()
         
-        auth_header = self.headers.get('Authorization')
-        if auth_header:
-            try:
-                auth_type, encoded = auth_header.split(' ', 1)
-                if auth_type.lower() == 'basic':
-                    decoded = base64.b64decode(encoded).decode('utf-8')
-                    username, password = decoded.split(':', 1)
-                    if username == admin_user and password == admin_pass:
-                        return True
-            except Exception as e:
-                print(f"เกิดข้อผิดพลาดในการถอดรหัสผ่าน Basic Auth: {e}")
-                
-        # ส่งสถานะ 401 เพื่อเรียกหน้าต่างล็อกอินของเว็บบราวเซอร์
-        self.send_response(401)
-        self.send_header('WWW-Authenticate', 'Basic realm="Thai Inter Flying Admin"')
-        self.send_header('Content-Type', 'text/html; charset=utf-8')
-        self.end_headers()
-        self.wfile.write("""
-        <html>
-            <head>
-                <title>401 Unauthorized</title>
-                <style>
-                    body { font-family: sans-serif; text-align: center; padding-top: 100px; background-color: #0f172a; color: #94a3b8; }
-                    h1 { color: #ef4444; }
-                </style>
-            </head>
-            <body>
-                <h1>401 Unauthorized</h1>
-                <p>กรุณาล็อกอินด้วยชื่อผู้ใช้และรหัสผ่านที่ถูกต้องเพื่อเข้าใช้งานแผงควบคุมระบบ</p>
-            </body>
-        </html>
-        """.encode('utf-8'))
+        cookie_header = self.headers.get('Cookie', '')
+        if f"admin_session={expected_session}" in cookie_header:
+            return True
         return False
     
     def do_GET(self):
         """
         จัดการคำขอ HTTP GET สำหรับการดึงข้อมูล API หรือการเรียกเข้าแดชบอร์ดหลัก
         """
-        # ตรวจสอบสิทธิ์การล็อกอินก่อนเข้าใช้งานเสมอ
-        if not self.check_auth():
-            return
-            
         # API: เรียกดึงประวัติข้อความของลูกค้า
-        if self.path == '/api/messages':
-            try:
-                conn = psycopg2.connect(DATABASE_URL)
-                cur = conn.cursor()
-                cur.execute("""
-                    SELECT user_id, message, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') 
-                    FROM messages 
-                    ORDER BY id DESC 
-                    LIMIT 100;
-                """)
-                rows = cur.fetchall()
-                cur.close()
-                conn.close()
-                
-                messages = [{"user_id": r[0], "message": r[1], "created_at": r[2]} for r in rows]
-                
-                self.send_response(200)
+        if self.path in ['/api/messages', '/api/keywords']:
+            if not self.check_auth():
+                self.send_response(401)
                 self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.end_headers()
-                self.wfile.write(json.dumps(messages).encode('utf-8'))
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": f"ข้อผิดพลาดจากเซิร์ฟเวอร์: {str(e)}"}).encode('utf-8'))
+                self.wfile.write(json.dumps({"error": "Unauthorized"}).encode('utf-8'))
+                return
                 
-        # API: เรียกดึงคีย์เวิร์ดทั้งหมดที่มีในระบบ
-        elif self.path == '/api/keywords':
-            try:
-                conn = psycopg2.connect(DATABASE_URL)
-                cur = conn.cursor()
-                cur.execute("SELECT keyword, reply_text FROM keywords ORDER BY keyword ASC;")
-                rows = cur.fetchall()
-                cur.close()
-                conn.close()
-                
-                keywords = [{"keyword": r[0], "reply_text": r[1]} for r in rows]
-                
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                self.end_headers()
-                self.wfile.write(json.dumps(keywords).encode('utf-8'))
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": f"ข้อผิดพลาดจากเซิร์ฟเวอร์: {str(e)}"}).encode('utf-8'))
-                
-        # แสดงหน้าจอหลัก Admin Dashboard (Frontend)
+            if self.path == '/api/messages':
+                try:
+                    conn = psycopg2.connect(DATABASE_URL)
+                    cur = conn.cursor()
+                    cur.execute("""
+                        SELECT user_id, message, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') 
+                        FROM messages 
+                        ORDER BY id DESC 
+                        LIMIT 100;
+                    """)
+                    rows = cur.fetchall()
+                    cur.close()
+                    conn.close()
+                    
+                    messages = [{"user_id": r[0], "message": r[1], "created_at": r[2]} for r in rows]
+                    
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json; charset=utf-8')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(messages).encode('utf-8'))
+                except Exception as e:
+                    self.send_response(500)
+                    self.send_header('Content-Type', 'application/json; charset=utf-8')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
+            else:  # /api/keywords
+                try:
+                    conn = psycopg2.connect(DATABASE_URL)
+                    cur = conn.cursor()
+                    cur.execute("SELECT keyword, reply_text FROM keywords ORDER BY keyword ASC;")
+                    rows = cur.fetchall()
+                    cur.close()
+                    conn.close()
+                    
+                    keywords = [{"keyword": r[0], "reply_text": r[1]} for r in rows]
+                    
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json; charset=utf-8')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(keywords).encode('utf-8'))
+                except Exception as e:
+                    self.send_response(500)
+                    self.send_header('Content-Type', 'application/json; charset=utf-8')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
         else:
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(HTML_DASHBOARD.encode('utf-8'))
+            # ตรวจสอบสิทธิ์การเข้าถึงหน้าแดชบอร์ด
+            if self.check_auth():
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.end_headers()
+                self.wfile.write(HTML_DASHBOARD.encode('utf-8'))
+            else:
+                # ส่งหน้าล็อกอินดีไซน์สวยงาม (HTML_LOGIN)
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.end_headers()
+                self.wfile.write(HTML_LOGIN.encode('utf-8'))
 
     def do_POST(self):
         """
-        จัดการคำขอ HTTP POST ซึ่งใช้รับข้อมูล Webhook จาก LINE และบันทึก/แก้ไขข้อมูลจากแดชบอร์ด
+        จัดการคำขอ HTTP POST (LINE Webhook, ล็อกอินหน้าบ้าน, บันทึก/ลบ คีย์เวิร์ด)
         """
-        # หากคำขอไม่ได้มาจาก LINE Webhook (พาธ /webhook) จะต้องตรวจสอบล็อกอินเสมอก่อนใช้งาน
-        if self.path != '/webhook':
-            if not self.check_auth():
-                return
+        # API: ตรวจสอบการเข้าสู่ระบบแดชบอร์ด (Login API)
+        if self.path == '/api/login':
+            try:
+                content_length = int(self.headers.get('Content-Length', 0))
+                body_bytes = self.rfile.read(content_length)
+                data = json.loads(body_bytes.decode('utf-8'))
+                
+                username = data.get('username', '').strip()
+                password = data.get('password', '')
+                
+                admin_user = os.environ.get("ADMIN_USERNAME", "admin")
+                admin_pass = os.environ.get("ADMIN_PASSWORD", "flying123")
+                
+                if username == admin_user and password == admin_pass:
+                    # สร้าง Session Token จาก hash เพื่อความปลอดภัย
+                    session_token = hashlib.sha256(f"{admin_user}:{admin_pass}".encode('utf-8')).hexdigest()
+                    
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json; charset=utf-8')
+                    self.send_header('Set-Cookie', f"admin_session={session_token}; Path=/; HttpOnly; Max-Age=86400; SameSite=Lax")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"status": "success", "message": "เข้าสู่ระบบสำเร็จ"}).encode('utf-8'))
+                else:
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json; charset=utf-8')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"status": "error", "message": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"}).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": f"เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์: {str(e)}"}).encode('utf-8'))
                 
         # API Dashboard: บันทึกหรืออัปเดต Keyword
-        if self.path == '/api/keywords/save':
+        elif self.path == '/api/keywords/save':
+            if not self.check_auth():
+                self.send_response(401)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "Unauthorized"}).encode('utf-8'))
+                return
+                
             try:
                 content_length = int(self.headers.get('Content-Length', 0))
                 body_bytes = self.rfile.read(content_length)
@@ -1121,6 +1347,13 @@ class handler(BaseHTTPRequestHandler):
                 
         # API Dashboard: ลบ Keyword ออกจากระบบ
         elif self.path == '/api/keywords/delete':
+            if not self.check_auth():
+                self.send_response(401)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "Unauthorized"}).encode('utf-8'))
+                return
+                
             try:
                 content_length = int(self.headers.get('Content-Length', 0))
                 body_bytes = self.rfile.read(content_length)
@@ -1154,6 +1387,13 @@ class handler(BaseHTTPRequestHandler):
                 
         # API Dashboard: ลบประวัติแชททั้งหมด
         elif self.path == '/api/messages/clear':
+            if not self.check_auth():
+                self.send_response(401)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "Unauthorized"}).encode('utf-8'))
+                return
+                
             try:
                 conn = psycopg2.connect(DATABASE_URL)
                 cur = conn.cursor()
@@ -1184,7 +1424,6 @@ class handler(BaseHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({"error": "ลายเซ็นไม่ถูกต้อง"}).encode('utf-8'))
-                print("คำเตือน: ลายเซ็นของ Webhook ไม่ถูกต้อง")
                 return
                 
             try:
